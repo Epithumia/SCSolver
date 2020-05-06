@@ -28,18 +28,27 @@ Version Notebook :
 Installation
 ------------
 
-Coming soon
-
-<!--
 ```
 git clone https://github.com/Epithumia/SCSolver.git
 pip install SCSolver
 ```
 
-Le NoteBook se trouve dans le Dossier SCSolver/NoteBook
--->
+Le NoteBook se trouvera dans le Dossier SCSolver/NoteBook dans une future révision
 
 Utilisation
 -----------
 
-Coming soon
+Usage: scsolver \[-p POPULATION_CIBLE>\] \[-s VOISIN\] <fichier donnees insee.xls> <fichier adjacences.csv> <fichier donnees geodata.(json|shp)> <ville de départ>
+
+Options:
+  -p POPULATION_CIBLE  Population cible (défaut : 50000).
+  -s                   Ne retourner qu'un solution.
+  -n VOISIN            Aide à identifier la commune en cas d'homonymes.
+  -v                   Affiche la progression.
+  -h, --help           Affiche ce message d'aide et termine.
+
+Exemple :
+
+```
+scsolver -v ensemble.xls adjacences.csv communes.json Nérac -p 40000
+```
