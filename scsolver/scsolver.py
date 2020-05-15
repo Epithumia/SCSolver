@@ -136,7 +136,7 @@ def solve(donnees, ville_depart, voisin, pop_cible, mono_sol, verbose=False):
                 liste_id_start.append(ville_pot[0])
 
     population_cible = pop_cible
-    toutes_solutions = mono_sol
+    toutes_solutions = not mono_sol
 
     # On résoud
     if len(liste_id_start) > 1:
@@ -184,7 +184,7 @@ def main():
     parser = optparse.OptionParser(usage=usage, add_help_option=False)
     parser.add_option('-p', dest="pop_cible", help="Population cible (défaut : 50000).", metavar="POPULATION_CIBLE",
                       default=50000, type=int)
-    parser.add_option('-s', dest="single", action="store_true", default=False, help="Ne retourner qu'un solution.")
+    parser.add_option('-s', dest="single", action="store_true", default=False, help="Ne retourner qu'une solution.")
     parser.add_option('-n', dest="voisin", metavar="VOISIN", default=None,
                       help="Aide à identifier la commune en cas d'homonymes.")
     parser.add_option('-v', dest="verbose", action="store_true", default=False, help="Affiche la progression.")
