@@ -31,7 +31,7 @@ git clone https://github.com/Epithumia/SCSolver.git
 pip install SCSolver
 ```
 
-Le NoteBook se trouve dans le Dossier SCSolver/NoteBook dans une future révision
+Le NoteBook se trouve dans le Dossier SCSolver/NoteBook
 
 Utilisation
 -----------
