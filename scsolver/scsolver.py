@@ -4,7 +4,6 @@ import logging
 import optparse
 from collections import deque
 
-import geopandas as geo
 import pandas as pd
 
 log = logging.getLogger(__name__)
@@ -71,7 +70,7 @@ def check_ville(ville, data_villes):
 
 def solve(donnees, ville_depart, voisin, pop_cible, mono_sol, verbose=False):
     # Chargement des données
-    insee, adjac, geofile = donnees
+    insee, adjac = donnees
     # On charge les données INSEE pour avoir les populations
     if verbose:
         log.info("Chargement des données INSEE...")
@@ -99,13 +98,6 @@ def solve(donnees, ville_depart, voisin, pop_cible, mono_sol, verbose=False):
         for i in range(row['nb_voisins']):
             voisins.append({'id': liste_v[i], 'cap': liste_cap[i]})
         adj_matrix[row['insee']] = voisins
-
-    # On charge les données de géolocalisation
-    if verbose:
-        log.info("Chargement des données OSM...")
-    geodata = geo.read_file(geofile)
-    geodata.set_index('insee', inplace=True)
-    geodata.crs = "EPSG:4326"
 
     # Résolution
 
@@ -146,21 +138,14 @@ def solve(donnees, ville_depart, voisin, pop_cible, mono_sol, verbose=False):
 
         chemins = bfs(id_start, data_villes, adj_matrix, population_cible, toutes_solutions)
 
-        g_start = geodata.loc[id_start]['geometry']
-        p_start = g_start.centroid
-
         # On construit le chemin
 
         chem_str_tab = []
         for chemin in chemins:
             chem_str = depart
-            ants = [[p_start.y, p_start.x]]
 
             for ville in chemin:
                 id = ville['id']
-                g = geodata.loc[id]['geometry']
-                p = g.centroid
-                ants.append([p.y, p.x])
                 data = data_villes.loc[id]
                 nom = data['Nom de la commune']
                 chem_str += '->' + nom
@@ -180,7 +165,7 @@ def main():
         :return: codes de sortie standards.
         """
     # noinspection SpellCheckingInspection
-    usage = 'usage: %prog [-p POPULATION_CIBLE>] [-s VOISIN] <fichier donnees insee.xls> <fichier adjacences.csv> <fichier donnees geodata.(json|shp)> <ville de départ>'
+    usage = 'usage: %prog [-p POPULATION_CIBLE>] [-s VOISIN] <fichier donnees insee.xls> <fichier adjacences.csv> <ville de départ>'
     parser = optparse.OptionParser(usage=usage, add_help_option=False)
     parser.add_option('-p', dest="pop_cible", help="Population cible (défaut : 50000).", metavar="POPULATION_CIBLE",
                       default=50000, type=int)
@@ -191,16 +176,14 @@ def main():
     parser.add_option('-h', '--help', action='help',
                       help="Affiche ce message d'aide et termine.")
     (opt, args) = parser.parse_args()
-    if len(args) != 4:
+    if len(args) != 3:
         parser.error("Mauvais nombre de paramètres.")
 
     insee = args[0]
     check_suffixe_fichier(insee, ['.xls'])
     adjac = args[1]
     check_suffixe_fichier(adjac, ['.csv'])
-    geofile = args[2]
-    check_suffixe_fichier(geofile, ['.json', '.shp'])
-    ville_depart = args[3]
+    ville_depart = args[2]
     voisin = opt.voisin
     verbose = opt.verbose
     pop_cible = opt.pop_cible
@@ -210,7 +193,7 @@ def main():
     else:
         logging.basicConfig(level=logging.WARN, format="%(asctime)s %(levelname)-7.7s %(message)s")
     try:
-        solve((insee, adjac, geofile), ville_depart, voisin, pop_cible, mono_sol, verbose)
+        solve((insee, adjac), ville_depart, voisin, pop_cible, mono_sol, verbose)
     except VilleNotFound as e:
         log.error("Erreur : " + e.args[0])
         exit(1)
